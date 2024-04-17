@@ -1,4 +1,15 @@
-import express, { request, response } from "express";
+import express from "express";
+import {
+  query,
+  validationResult,
+  body,
+  matchedData,
+  checkSchema,
+} from "express-validator";
+import {
+  createUserValidationSchema,
+  getUsersValidationSchema,
+} from "./utils/validationSchemas.mjs";
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -48,16 +59,24 @@ app.get(
 //   response.status(201).send({ msg: "Api" });
 // });
 
-app.get("/api/users", function (request, response) {
-  const {
-    query: { filter, value },
-  } = request;
-  if (filter && value)
-    return response.send(
-      mockUsers.filter((user) => user[filter].includes(value))
-    );
-  return response.send(mockUsers);
-});
+app.get(
+  "/api/users",
+  checkSchema(getUsersValidationSchema),
+  function (request, response) {
+    const result = validationResult(request);
+    if (!result.isEmpty())
+      return response.status(400).send({ errors: result.array() });
+
+    const data = matchedData(request);
+    const { filter, value } = data;
+
+    if (filter && value)
+      return response.send(
+        mockUsers.filter((user) => user[filter].includes(value))
+      );
+    return response.send(mockUsers);
+  }
+);
 
 app.get("/api/products", function (request, response) {
   response.send([
@@ -79,15 +98,25 @@ app.get("/api/users/:id", resolveIndexByUserId, function (request, response) {
   return response.send(findUser);
 });
 
-app.post("/api/users", function (request, response) {
-  const { body } = request;
-  const newUser = {
-    id: mockUsers[mockUsers.length - 1].id + 1,
-    ...body,
-  };
-  mockUsers.push(newUser);
-  return response.status(200).send({ msg: "User added!", newUser: [newUser] });
-});
+app.post(
+  "/api/users",
+  checkSchema(createUserValidationSchema),
+  function (request, response) {
+    const result = validationResult(request);
+    console.log(result);
+    if (!result.isEmpty())
+      return response.status(400).send({ errors: result.array() });
+    const data = matchedData(request);
+    const newUser = {
+      id: mockUsers[mockUsers.length - 1].id + 1,
+      ...data,
+    };
+    mockUsers.push(newUser);
+    return response
+      .status(200)
+      .send({ msg: "User added!", newUser: [newUser] });
+  }
+);
 
 // app.use(loggingMiddleWare); // now middleWare will be used for below request.
 app.put("/api/users/:id", resolveIndexByUserId, function (request, response) {
