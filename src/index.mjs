@@ -12,7 +12,6 @@ const loggingMiddleWare = (request, response, next) => {
 
 const resolveIndexByUserId = (request, response, next) => {
   const {
-    body,
     params: { id },
   } = request;
   const parsedId = parseInt(id);
@@ -73,11 +72,9 @@ app.use(loggingMiddleWare, function (request, response, next) {
   next();
 });
 
-app.get("/api/users/:id", function (request, response) {
-  const parsedId = parseInt(request.params.id);
-  if (isNaN(parsedId))
-    return response.status(400).send({ msg: "Bad Request. Invalid ID" });
-  const findUser = mockUsers.find((user) => user.id == parsedId);
+app.get("/api/users/:id", resolveIndexByUserId, function (request, response) {
+  const { findUserIndex } = request;
+  const findUser = mockUsers[findUserIndex];
   if (!findUser) return response.status(404);
   return response.send(findUser);
 });
@@ -99,30 +96,21 @@ app.put("/api/users/:id", resolveIndexByUserId, function (request, response) {
   return response.sendStatus(200);
 });
 
-app.patch("/api/users/:id", function (request, response) {
-  const {
-    body,
-    params: { id },
-  } = request;
-  const parsedId = Number(id);
-  if (isNaN(parsedId)) return response.sendStatus(400);
-  const findUserIndex = mockUsers.findIndex((user) => user.id == parsedId);
-  if (findUserIndex == -1) return response.sendStatus(404);
+app.patch("/api/users/:id", resolveIndexByUserId, function (request, response) {
+  const { body, findUserIndex } = request;
   mockUsers[findUserIndex] = { ...mockUsers[findUserIndex], ...body };
   return response.sendStatus(200);
 });
 
-app.delete("/api/users/:id", function (request, response) {
-  const {
-    params: { id },
-  } = request;
-  const parsedId = Number(id);
-  if (isNaN(parsedId)) return response.sendStatus(400);
-  const findUserIndex = mockUsers.findIndex((user) => user.id === parsedId);
-  if (findUserIndex === -1) return response.sendStatus(400);
-  mockUsers.splice(findUserIndex, 1);
-  return response.sendStatus(200);
-});
+app.delete(
+  "/api/users/:id",
+  resolveIndexByUserId,
+  function (request, response) {
+    const { findUserIndex } = request;
+    mockUsers.splice(findUserIndex, 1);
+    return response.sendStatus(200);
+  }
+);
 
 app.listen(PORT, function () {
   console.log(`Running on Port ${PORT}`);
