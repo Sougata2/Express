@@ -12,4 +12,9 @@ const mockProducts = [
   { id: 2, name: "Product 2", price: 200 },
 ];
 
-export { mockUsers, mockProducts };
+const mockProductsSigned = [
+  { id: 3, name: "Product 3", price: 300 },
+  { id: 4, name: "Product 4", price: 400 },
+];
+
+export { mockUsers, mockProducts, mockProductsSigned };
