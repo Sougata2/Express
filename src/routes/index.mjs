@@ -2,12 +2,12 @@ import { Router } from "express";
 import userRouter from "./users.mjs";
 import productRouter from "./products.mjs";
 
-const router = Router();
+const routes = Router();
 
 // routes for user GET, POST, PUT, PATCH, DELETE requests
-router.use(userRouter);
+routes.use(userRouter);
 
 // routest for products GET, POST, PUT, PATCH, DELETE requests
-router.use(productRouter);
+routes.use(productRouter);
 
-export default router;
+export default routes;

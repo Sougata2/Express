@@ -1,9 +1,9 @@
 const mockUsers = [
-  { id: 1, username: "admin", displayName: "Admin" },
-  { id: 2, username: "anson", displayName: "Anson" },
-  { id: 3, username: "jonson", displayName: "Jonson" },
-  { id: 4, username: "manson", displayName: "Manson" },
-  { id: 5, username: "tenson", displayName: "Tenson" },
+  { id: 1, username: "admin", displayName: "Admin", password: "hello1" },
+  { id: 2, username: "anson", displayName: "Anson", password: "hello2" },
+  { id: 3, username: "jonson", displayName: "Jonson", password: "hello3" },
+  { id: 4, username: "manson", displayName: "Manson", password: "hello4" },
+  { id: 5, username: "tenson", displayName: "Tenson", password: "hello5" },
   { id: 6, username: "jay", displayName: "Jay" },
 ];
 
