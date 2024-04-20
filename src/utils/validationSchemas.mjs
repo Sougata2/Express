@@ -20,6 +20,11 @@ export const createUserValidationSchema = {
       errorMessage: "Display cannot be empty",
     },
   },
+  password: {
+    notEmpty: {
+      errorMessage: "Password cannot be empty",
+    },
+  },
 };
 
 export const getUsersValidationSchema = {

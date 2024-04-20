@@ -6,12 +6,13 @@ import {
 import { mockUsers } from "../utils/constants.mjs";
 import { checkSchema, validationResult, matchedData } from "express-validator";
 import { resolveIndexByUserId } from "../utils/middleware.mjs";
+import { user } from "../mongoos/schema/user.mjs";
 
 const userRouter = Router();
 userRouter.get(
   "/api/users",
   checkSchema(getUsersValidationSchema),
-  function (request, response) {
+  async function (request, response) {
     const result = validationResult(request);
     if (!result.isEmpty())
       return response.status(400).send({ errors: result.array() });
@@ -23,27 +24,32 @@ userRouter.get(
       return response.send(
         mockUsers.filter((user) => user[filter].includes(value))
       );
-    return response.send(mockUsers);
+    return response.status(200).send(await user.find());
   }
 );
 
 userRouter.post(
   "/api/users",
   checkSchema(createUserValidationSchema),
-  function (request, response) {
+  async function (request, response) {
     const result = validationResult(request);
-    console.log(result);
+    // console.log(result);
     if (!result.isEmpty())
       return response.status(400).send({ errors: result.array() });
+
     const data = matchedData(request);
-    const newUser = {
+    const newUser = new user({
       id: mockUsers[mockUsers.length - 1].id + 1,
       ...data,
-    };
-    mockUsers.push(newUser);
-    return response
-      .status(200)
-      .send({ msg: "User added!", newUser: [newUser] });
+    });
+
+    try {
+      const savedUser = await newUser.save();
+      return response.status(201).send(savedUser);
+    } catch (error) {
+      console.log(error);
+      return response.sendStatus(400);
+    }
   }
 );
 

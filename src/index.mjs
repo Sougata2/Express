@@ -2,7 +2,14 @@ import express from "express";
 import routes from "./routes/index.mjs";
 import cookieParser from "cookie-parser";
 import session from "express-session";
+import mongoose from "mongoose";
 import passport from "./strategies/local-strategy.mjs";
+
+// Connection to data base
+mongoose
+  .connect("mongodb://localhost/express")
+  .then(() => console.log("Database Connected~"))
+  .catch((err) => console.error(`Error : ${err}`));
 
 const app = express();
 const PORT = process.env.PORT || 3000;
