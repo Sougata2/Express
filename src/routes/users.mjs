@@ -7,6 +7,7 @@ import { mockUsers } from "../utils/constants.mjs";
 import { checkSchema, validationResult, matchedData } from "express-validator";
 import { resolveIndexByUserId } from "../utils/middleware.mjs";
 import { user } from "../mongoos/schema/user.mjs";
+import { hasPassword } from "../utils/helpers.mjs";
 
 const userRouter = Router();
 userRouter.get(
@@ -38,6 +39,7 @@ userRouter.post(
       return response.status(400).send({ errors: result.array() });
 
     const data = matchedData(request);
+    data.password = await hasPassword(data.password);
     const newUser = new user({
       id: mockUsers[mockUsers.length - 1].id + 1,
       ...data,
